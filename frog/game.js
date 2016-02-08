@@ -59,6 +59,7 @@ Character = function (game) {
     this.anchor.setTo(0.5, 0.5);
     this.scale.setTo(0.5, 0.5);
     jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
     this.jumpStartTime = 0; 
 };
 
@@ -68,13 +69,22 @@ Character.prototype.constructor = Character;
 Character.prototype.update = function(game) {
     this.game.debug.text(this.jumpStartTime, 2, 38, "#00ff00");
 
-    if (jumpButton.isDown) {
-        this.jumpStartTime = this.game.time.now;
-    }
     if (jumpButton.isDown && (this.body.onFloor() || this.body.touching.down)) {
-        this.body.velocity.y = -800;
-        this.body.velocity.x = 300;
-    } else if (this.body.onFloor() || this.body.touching.down) {
+        if (this.jumpStartTime == 0) {
+            this.jumpStartTime = this.game.time.now;
+        }
+    }
+    if (jumpButton.isUp 
+        && (this.body.onFloor() || this.body.touching.down) 
+        && this.jumpStartTime > 0) {
+        var speed = this.game.time.now - this.jumpStartTime;
+        this.game.debug.text(speed, 2, 58, "#00ff00");
+
+        this.body.velocity.y = -speed * 1.6;
+        this.body.velocity.x = speed * 0.7;
+        this.jumpStartTime = 0;
+    }
+    else if (this.body.onFloor() || this.body.touching.down) {
         this.body.velocity.x = 0;
     }
 };
