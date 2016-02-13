@@ -33,8 +33,7 @@ window.onload = function() {
 
     function update () {
         game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
-        // game.debug.text(jumpStartTime, 2, 38, "#00ff00");
-
+  
         game.physics.arcade.collide(character, platforms);
         platforms.setAll('body.immovable', true);
     }
@@ -65,14 +64,6 @@ Character = function (game) {
     jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
     this.jumpStartTime = 0;
-    this.powerBar = new PowerBar(game, {
-            width: 100, 
-            height: 15, 
-            bgColor: '#fff',
-            color: '#FF0000'
-        });
-
-
 };
 
 Character.prototype = Object.create(Phaser.Sprite.prototype);
@@ -85,7 +76,6 @@ Character.prototype.update = function(game) {
         if (this.jumpStartTime == 0) {
             this.jumpStartTime = this.game.time.now;
         }
-        this.powerBar.setPercent((this.game.time.now - this.jumpStartTime) / 10);
     }
     if (jumpButton.isUp 
         && (this.body.onFloor() || this.body.touching.down) 
@@ -97,8 +87,6 @@ Character.prototype.update = function(game) {
         this.body.velocity.y = -speed * 1.6;
         this.body.velocity.x = speed * 0.7;
         this.jumpStartTime = 0;
-
-        this.powerBar.setPercent(0);
     }
     else if (this.body.onFloor() || this.body.touching.down) {
         this.body.velocity.x = 0;
@@ -122,39 +110,3 @@ Platform.prototype.update = function() {
         this.destroy();
     }
 };
-
-// ====================================================
-PowerBar = function (game, config) {
-    this.game = game;
-    this.config = config;
-    this.drawBackground();
-    this.drawLoadBaar();
-};
-
-PowerBar.prototype.constructor = PowerBar;
-
-PowerBar.prototype.drawBackground = function() {
-    var background = this.game.add.bitmapData(this.config.width, this.config.height);
-    background.ctx.fillStyle = this.config.bgColor;
-    background.ctx.beginPath();
-    background.ctx.rect(0, 0, this.config.width, this.config.height);
-    background.ctx.fill();
-
-    this.bgSprite = this.game.add.sprite(100, 100, background);
-};
-
-PowerBar.prototype.drawLoadBaar = function() {
-    var background = this.game.add.bitmapData(this.config.width, this.config.height);
-    background.ctx.fillStyle = this.config.color;
-    background.ctx.beginPath();
-    background.ctx.rect(0, 0, this.config.width, this.config.height);
-    background.ctx.fill();
-
-    this.barSprite = this.game.add.sprite(100, 90, background);
-};
-
-PowerBar.prototype.setPercent = function(percent) {
-    percent = percent > 100 ? 100 : percent;
-    var newWidth = (percent * this.config.width) / 100;
-    this.game.add.tween(this.barSprite).to({width: newWidth}, 10, Phaser.Easing.Linear.None, true);
-}
