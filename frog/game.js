@@ -1,6 +1,6 @@
 window.onload = function() {
 
-    var game = new Phaser.Game(848, 480, Phaser.AUTO, '', { preload: preload, create: create, update: update});
+    var game = new Phaser.Game(848, 480, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render});
     var jumpButton;
     var platforms;
     var character;
@@ -15,10 +15,11 @@ window.onload = function() {
     const PLATFORM_VELOCITY = -120;
 
     function preload () {
-        game.load.image('platform', 'assets/platform.png');
+        // game.load.image('platform', 'assets/platform.png');
+        game.load.image('platform', 'assets/river_sheet.png');
         game.load.image('sky', 'assets/background_sky.jpg');
 
-        game.load.spritesheet('frog', 'assets/frog.png', 512, 512, 5);
+        game.load.spritesheet('frog', 'assets/frog.png', 512, 432, 5);
     }
 
     function create () {
@@ -29,13 +30,6 @@ window.onload = function() {
 
         character = new Character(game);
         createPlatform();
-
-        frog.scale.setTo(0.2, 0.2);
-        frog.animations.add('jump');
-        frog.animations.play('jump', 15, true);
-        
-        frog.animations.add('down', [1], 15, true);
-        frog.animations.play('down', 15, true);
     }
 
     function update () {
@@ -47,9 +41,19 @@ window.onload = function() {
         game.time.events.add(game.rnd.between(PLATFORM_MIN_DELAY, PLATFORM_MAX_DELAY), function() {
             var platform = new Platform(game);
             game.add.existing(platform);
+
             platforms.add(platform);
             createPlatform();
         });
+    }
+
+    function render() {
+//        game.debug.body(character);
+//        platforms.forEachAlive(renderGroup, this);
+    }
+
+    function renderGroup(member) {
+        game.debug.body(member);
     }
 };
 
@@ -108,7 +112,8 @@ Platform = function (game) {
     Phaser.Sprite.call(this, game, game.width + 50, game.height - 50, 'platform');
     game.physics.enable(this, Phaser.Physics.ARCADE);
     this.anchor.set(0.5);
-    this.scale.setTo(0.3, 0.3);
+    this.scale.setTo(0.25, 0.25);
+    this.body.setSize(200, 50, 0, 20);
 };
 
 Platform.prototype = Object.create(Phaser.Sprite.prototype);
